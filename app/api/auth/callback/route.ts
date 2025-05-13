@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
+import qs from 'qs';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');
+
+  console.log('the code', code)
   
   if (!code) {
     return NextResponse.json(
@@ -24,18 +27,27 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const response = await axios.post('https://api.pinterest.com/v5/oauth/token', {
+    const payload = qs.stringify({
       grant_type: 'authorization_code',
       client_id: clientId,
       client_secret: clientSecret,
-      code: code,
+      code,
       redirect_uri: `${baseUrl}/api/auth/callback`,
-    }, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
     });
+
+    const combo = `${clientId}:${clientSecret}`
+    const encodedCombo = Buffer.from(combo).toString('base64');
+
+    const response = await axios.post(
+      'https://api.pinterest.com/v5/oauth/token',
+      payload,
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Basic ${encodedCombo}`
+        },
+      }
+    );
 
     return NextResponse.json({
       access_token: response.data.access_token,
