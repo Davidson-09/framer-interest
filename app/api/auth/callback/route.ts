@@ -6,6 +6,23 @@ import { serialize } from 'cookie';
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');
+  const state = searchParams.get('state');
+
+  // Default redirect URL
+  let redirectUrl = process.env.NEXT_PUBLIC_BASE_URL || '/';
+
+  // Try to parse the state parameter to get the returnTo URL
+  if (state) {
+    try {
+      const stateObj = JSON.parse(decodeURIComponent(state));
+      if (stateObj.returnTo) {
+        redirectUrl = stateObj.returnTo;
+      }
+    } catch (error) {
+      console.error('Error parsing state parameter:', error);
+      // Continue with default redirect URL if state parsing fails
+    }
+  }
 
   if (!code) {
     return NextResponse.json(
@@ -59,7 +76,8 @@ export async function GET(request: NextRequest) {
       maxAge: 60 * 60 * 24, // 1 day
     });
 
-    const res = NextResponse.redirect(`${baseUrl}/`); // Change path if needed
+    // Redirect to the previous page instead of the base URL
+    const res = NextResponse.redirect(redirectUrl);
     res.headers.set('Set-Cookie', cookie);
     return res;
 

@@ -5,7 +5,9 @@ import ModernSofa from "./components/ModernSofa";
 
 export default function Home() {
   const handlePinterestLogin = () => {
-    window.location.href = '/api/auth/login';
+    // Get the current URL to return to after authentication
+    const currentUrl = window.location.href;
+    window.location.href = `/api/auth/login?returnTo=${encodeURIComponent(currentUrl)}`;
   };
 
   return (
