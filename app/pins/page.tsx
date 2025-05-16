@@ -24,7 +24,22 @@ export default async function PinsPage() {
 
   return (
     <main className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
-      {pins?.pins?.map((pin) => (
+      {pins?.pins?.map((pin: {
+        id: string;
+        title: string;
+        description: string;
+        link: string;
+        media: {
+          images: {
+            "600x": {
+              url: string;
+            };
+            "400x300": {
+              url: string;
+            };
+          };
+        };
+      }) => (
           <div
             key={pin.id}
             className="rounded-2xl overflow-hidden shadow-md bg-white hover:shadow-xl transition-shadow"
