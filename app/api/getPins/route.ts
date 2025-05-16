@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
+import { parse } from 'cookie';
 
 interface Board {
   id: string;
@@ -7,7 +8,7 @@ interface Board {
 }
 
 async function getAllBoards(accessToken: string) {
-  const response = await axios.get('https://api.pinterest.com/v5/user_account/boards', {
+  const response = await axios.get('https://api.pinterest.com/v5/boards', {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },
@@ -31,37 +32,42 @@ async function getPinsForBoard(accessToken: string, boardId: string) {
 }
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization');
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  // Parse cookies
+  const cookieHeader = request.headers.get('cookie') || '';
+  const cookies = parse(cookieHeader);
+  const accessToken = cookies.pinterest_token;
+
+  console.log('the acess token', accessToken)
+
+  if (!accessToken) {
     return NextResponse.json(
-      { error: 'Missing or invalid authorization header' },
+      { error: 'Pinterest access token not found in cookies' },
       { status: 401 }
     );
   }
 
-  const accessToken = authHeader.split(' ')[1];
-
   try {
-    // Get all boards
     const boards = await getAllBoards(accessToken);
-    
-    // Get pins for each board
-    const pinsPromises = boards.map((board: Board) => getPinsForBoard(accessToken, board.id));
+
+    const pinsPromises = boards.map((board: Board) =>
+      getPinsForBoard(accessToken, board.id)
+    );
     const pinsResults = await Promise.all(pinsPromises);
-    
-    // Flatten the array of pin arrays
+
     const allPins = pinsResults.flat();
-    
+
     return NextResponse.json({
       total_pins: allPins.length,
       pins: allPins,
     });
-  } catch (error) {
-    console.error('Error fetching pins:', error);
+    // return NextResponse.json({
+    //   boards: boards,
+    // });
+  } catch (error: any) {
+    console.error('Error fetching pins:', error.response?.data || error.message);
     return NextResponse.json(
       { error: 'Failed to fetch pins' },
       { status: 500 }
     );
   }
-} 
+}
