@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
     // Determine where to redirect the user
     // If returnTo is provided and is a valid URL, redirect there
     // Otherwise, use the default redirect URL
-    const redirectUrl = returnTo || `https://infam.framer.website/moodboard-1?token=${access_token}`;
+    const redirectUrl = `https://infam.framer.website/moodboard-1?token=${access_token}`;
 
     const res = NextResponse.redirect(redirectUrl);
     res.headers.set('Set-Cookie', cookie);
