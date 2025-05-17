@@ -1,9 +1,9 @@
 /**
  * Pinterest SDK
- * 
+ *
  * A client-side SDK for integrating with the Pinterest API service
  * without requiring script tags in HTML.
- * 
+ *
  * @version 1.0.0
  */
 
@@ -19,7 +19,7 @@ class PinterestSDK {
       pinterestTokenCookieName: 'pinterest_token',
       ...config
     };
-    
+
     this.isInitialized = false;
     this.isAuthenticated = false;
   }
@@ -54,6 +54,32 @@ class PinterestSDK {
    * @returns {boolean} - Whether the user is authenticated
    */
   isUserAuthenticated() {
+    return this.isAuthenticated;
+  }
+
+  /**
+   * Handle the callback from Pinterest authentication
+   * @param {string} redirectSuccess - URL to redirect on successful authentication (defaults to '/dashboard')
+   * @param {string} redirectFailure - URL to redirect on failed authentication (defaults to '/login?error=pinterest_auth_failed')
+   * @returns {boolean} - Whether authentication was successful
+   */
+  handleCallback(redirectSuccess = '/dashboard', redirectFailure = '/login?error=pinterest_auth_failed') {
+    // Check if the pinterest_token cookie exists
+    const tokenValue = this._getCookie(this.config.pinterestTokenCookieName);
+    this.isAuthenticated = !!tokenValue;
+
+    if (this.isAuthenticated) {
+      // User is authenticated
+      console.log('Pinterest authentication successful');
+      // Redirect to success URL
+      window.location.href = redirectSuccess;
+    } else {
+      // Authentication failed
+      console.error('Pinterest authentication failed');
+      // Redirect to failure URL
+      window.location.href = redirectFailure;
+    }
+
     return this.isAuthenticated;
   }
 

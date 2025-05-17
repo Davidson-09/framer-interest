@@ -11,43 +11,43 @@
       margin: 0 auto;
       padding: 20px;
     }
-    
+
     .pinterest-pins-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 20px;
       margin-top: 20px;
     }
-    
+
     .pinterest-pin {
       border: 1px solid #e0e0e0;
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    
+
     .pinterest-pin-image img {
       width: 100%;
       height: auto;
       display: block;
     }
-    
+
     .pinterest-pin-content {
       padding: 15px;
     }
-    
+
     .pinterest-pin-content h3 {
       margin-top: 0;
       margin-bottom: 8px;
       font-size: 16px;
     }
-    
+
     .pinterest-pin-content p {
       margin: 0 0 15px;
       font-size: 14px;
       color: #666;
     }
-    
+
     .pinterest-pin-content a {
       display: inline-block;
       padding: 6px 12px;
@@ -57,7 +57,7 @@
       border-radius: 4px;
       font-size: 14px;
     }
-    
+
     button {
       padding: 10px 16px;
       background-color: #e60023;
@@ -67,13 +67,13 @@
       cursor: pointer;
       font-size: 16px;
     }
-    
+
     .loading, .error {
       text-align: center;
       padding: 40px;
       font-size: 18px;
     }
-    
+
     .error {
       color: #e60023;
     }
@@ -81,7 +81,7 @@
 </head>
 <body>
   <h1>Pinterest Integration Example</h1>
-  
+
   <div id="pinterest-container">
     <div id="pinterest-loading" class="loading">Loading...</div>
     <div id="pinterest-error" class="error" style="display: none;"></div>
@@ -97,7 +97,7 @@
 
   <!-- Import the Pinterest SDK -->
   <script src="https://cdn.jsdelivr.net/npm/pinterest-integration-sdk@1.0.0/pinterest-sdk.min.js"></script>
-  
+
   <script>
     // Elements
     const loadingEl = document.getElementById('pinterest-loading');
@@ -106,38 +106,38 @@
     const contentEl = document.getElementById('pinterest-content');
     const pinsEl = document.getElementById('pinterest-pins');
     const loginBtn = document.getElementById('pinterest-login-btn');
-    
+
     // Initialize the SDK
     const pinterest = new PinterestSDK({
       apiBaseUrl: 'https://framer-interest.vercel.app', // Replace with your actual service URL
     });
-    
+
     // Show error message
     function showError(message) {
       errorEl.textContent = `Error: ${message}`;
       errorEl.style.display = 'block';
       loadingEl.style.display = 'none';
     }
-    
+
     // Render pins
     function renderPins(pins) {
       if (!pins || pins.length === 0) {
         pinsEl.innerHTML = '<p>No pins found.</p>';
         return;
       }
-      
+
       // Clear the container
       pinsEl.innerHTML = '';
-      
+
       // Render each pin
       pins.forEach(pin => {
         const pinElement = document.createElement('div');
         pinElement.className = 'pinterest-pin';
-        
+
         pinElement.innerHTML = `
           <div class="pinterest-pin-image">
-            ${pin.media?.images?.["600x"]?.url ? 
-              `<img src="${pin.media.images["600x"].url}" alt="${pin.title || 'Pinterest Pin'}">` : 
+            ${pin.media?.images?.["600x"]?.url ?
+              `<img src="${pin.media.images["600x"].url}" alt="${pin.title || 'Pinterest Pin'}">` :
               '<div class="pinterest-pin-no-image">No image</div>'}
           </div>
           <div class="pinterest-pin-content">
@@ -146,21 +146,21 @@
             ${pin.link ? `<a href="${pin.link}" target="_blank" rel="noopener noreferrer">Visit</a>` : ''}
           </div>
         `;
-        
+
         pinsEl.appendChild(pinElement);
       });
     }
-    
+
     // Fetch and render pins
     async function fetchAndRenderPins() {
       try {
         loadingEl.style.display = 'block';
         contentEl.style.display = 'none';
         errorEl.style.display = 'none';
-        
+
         const pins = await pinterest.fetchPins();
         renderPins(pins);
-        
+
         loadingEl.style.display = 'none';
         contentEl.style.display = 'block';
       } catch (error) {
@@ -168,13 +168,13 @@
         console.error('Error fetching pins:', error);
       }
     }
-    
+
     // Initialize the app
     async function init() {
       try {
         await pinterest.init();
         const isAuthenticated = pinterest.isUserAuthenticated();
-        
+
         if (isAuthenticated) {
           await fetchAndRenderPins();
         } else {
@@ -186,12 +186,14 @@
         console.error('Error initializing Pinterest SDK:', error);
       }
     }
-    
+
     // Handle login button click
     loginBtn.addEventListener('click', () => {
-      pinterest.login(window.location.href);
+      // Redirect to the callback page after authentication
+      const callbackUrl = `${window.location.origin}${window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))}/vanilla-js-callback.html`;
+      pinterest.login(callbackUrl);
     });
-    
+
     // Start the app
     init();
   </script>

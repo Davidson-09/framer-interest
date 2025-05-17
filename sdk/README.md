@@ -105,6 +105,20 @@ pinterest.login();
 pinterest.login('https://example.com/callback');
 ```
 
+#### `handleCallback(redirectSuccess, redirectFailure)`
+
+Handle the callback from Pinterest authentication. This method checks if the Pinterest token cookie exists, and redirects the user accordingly.
+
+```javascript
+// Handle callback with default redirects
+// Success: /dashboard
+// Failure: /login?error=pinterest_auth_failed
+pinterest.handleCallback();
+
+// Handle callback with custom redirects
+pinterest.handleCallback('/home', '/login');
+```
+
 #### `isUserAuthenticated()`
 
 Check if the user is authenticated with Pinterest.
@@ -134,7 +148,9 @@ try {
 }
 ```
 
-## Example
+## Examples
+
+### Main Page Example
 
 ```javascript
 import PinterestSDK from 'pinterest-integration-sdk';
@@ -147,26 +163,26 @@ const pinterest = new PinterestSDK({
 // Check if the user is authenticated
 pinterest.init().then(async () => {
   const isAuthenticated = pinterest.isUserAuthenticated();
-  
+
   if (isAuthenticated) {
     // Fetch pins
     try {
       const pins = await pinterest.fetchPins();
-      
+
       // Do something with the pins
       console.log('Pins:', pins);
-      
+
       // Example: Render pins to a container
       const container = document.getElementById('pinterest-pins');
       pins.forEach(pin => {
         const pinElement = document.createElement('div');
         pinElement.className = 'pinterest-pin';
-        
+
         // Create pin content
         pinElement.innerHTML = `
           <div class="pinterest-pin-image">
-            ${pin.media?.images?.["600x"]?.url ? 
-              `<img src="${pin.media.images["600x"].url}" alt="${pin.title || 'Pinterest Pin'}">` : 
+            ${pin.media?.images?.["600x"]?.url ?
+              `<img src="${pin.media.images["600x"].url}" alt="${pin.title || 'Pinterest Pin'}">` :
               '<div class="pinterest-pin-no-image">No image</div>'}
           </div>
           <div class="pinterest-pin-content">
@@ -175,7 +191,7 @@ pinterest.init().then(async () => {
             ${pin.link ? `<a href="${pin.link}" target="_blank" rel="noopener noreferrer">Visit</a>` : ''}
           </div>
         `;
-        
+
         container.appendChild(pinElement);
       });
     } catch (error) {
@@ -189,6 +205,30 @@ pinterest.init().then(async () => {
       pinterest.login();
     });
   }
+});
+```
+
+### Callback Page Example
+
+Create a separate callback page to handle the Pinterest authentication callback:
+
+```javascript
+import PinterestSDK from 'pinterest-integration-sdk';
+
+// Initialize the SDK
+const pinterest = new PinterestSDK({
+  apiBaseUrl: 'https://framer-interest.vercel.app',
+});
+
+// Handle the callback
+document.addEventListener('DOMContentLoaded', () => {
+  // This will check for the Pinterest token cookie and redirect accordingly
+  // - If authenticated: redirects to '/dashboard'
+  // - If not authenticated: redirects to '/login?error=pinterest_auth_failed'
+  pinterest.handleCallback();
+
+  // You can also specify custom redirect URLs:
+  // pinterest.handleCallback('/home', '/login');
 });
 ```
 

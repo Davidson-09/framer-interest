@@ -19,7 +19,7 @@ function PinterestIntegration() {
         await pinterest.init();
         const authenticated = pinterest.isUserAuthenticated();
         setIsAuthenticated(authenticated);
-        
+
         if (authenticated) {
           await fetchPins();
         }
@@ -49,7 +49,9 @@ function PinterestIntegration() {
   }
 
   function handleLogin() {
-    pinterest.login(window.location.href);
+    // Redirect to the callback page after authentication
+    const callbackUrl = `${window.location.origin}/callback`;
+    pinterest.login(callbackUrl);
   }
 
   if (loading) {
@@ -81,9 +83,9 @@ function PinterestIntegration() {
             <div key={pin.id} className="pinterest-pin">
               {pin.media?.images?.["600x"]?.url && (
                 <div className="pinterest-pin-image">
-                  <img 
-                    src={pin.media.images["600x"].url} 
-                    alt={pin.title || 'Pinterest Pin'} 
+                  <img
+                    src={pin.media.images["600x"].url}
+                    alt={pin.title || 'Pinterest Pin'}
                   />
                 </div>
               )}
@@ -91,9 +93,9 @@ function PinterestIntegration() {
                 <h3>{pin.title || 'Untitled'}</h3>
                 <p>{pin.description || ''}</p>
                 {pin.link && (
-                  <a 
-                    href={pin.link} 
-                    target="_blank" 
+                  <a
+                    href={pin.link}
+                    target="_blank"
                     rel="noopener noreferrer"
                   >
                     Visit

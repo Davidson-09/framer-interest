@@ -171,10 +171,16 @@ Create a callback page on your site to handle the redirect:
 // On your callback page (e.g., /pinterest-callback)
 function handlePinterestCallback() {
   // Check if the pinterest_token cookie exists
-  const cookies = document.cookie.split(';');
-  const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('pinterest_token='));
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+  }
 
-  if (tokenCookie) {
+  const tokenValue = getCookie('pinterest_token');
+
+  if (tokenValue) {
     // User is authenticated
     console.log('Pinterest authentication successful');
     // Redirect to your app's main page or dashboard

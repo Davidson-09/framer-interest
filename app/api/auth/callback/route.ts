@@ -61,6 +61,7 @@ export async function GET(request: NextRequest) {
     );
 
     const { access_token } = response.data;
+    console.log('the access token', access_token)
 
     // Set token in secure HttpOnly cookie
     const cookie = serialize('pinterest_token', access_token, {

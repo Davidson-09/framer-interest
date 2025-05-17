@@ -8,7 +8,7 @@ interface PinterestSDKConfig {
    * @default 'https://framer-interest.vercel.app'
    */
   apiBaseUrl?: string;
-  
+
   /**
    * Name of the cookie that stores the Pinterest token
    * @default 'pinterest_token'
@@ -39,52 +39,60 @@ declare class PinterestSDK {
    * @param config - Configuration options
    */
   constructor(config?: PinterestSDKConfig);
-  
+
   /**
    * Configuration options
    */
   config: PinterestSDKConfig;
-  
+
   /**
    * Whether the SDK has been initialized
    */
   isInitialized: boolean;
-  
+
   /**
    * Whether the user is authenticated with Pinterest
    */
   isAuthenticated: boolean;
-  
+
   /**
    * Initialize the Pinterest SDK
    * @returns Whether initialization was successful
    */
   init(): Promise<boolean>;
-  
+
   /**
    * Login with Pinterest
    * @param returnUrl - URL to return to after authentication (defaults to current URL)
    */
   login(returnUrl?: string): void;
-  
+
   /**
    * Check if the user is authenticated with Pinterest
    * @returns Whether the user is authenticated
    */
   isUserAuthenticated(): boolean;
-  
+
+  /**
+   * Handle the callback from Pinterest authentication
+   * @param redirectSuccess - URL to redirect on successful authentication (defaults to '/dashboard')
+   * @param redirectFailure - URL to redirect on failed authentication (defaults to '/login?error=pinterest_auth_failed')
+   * @returns Whether authentication was successful
+   */
+  handleCallback(redirectSuccess?: string, redirectFailure?: string): boolean;
+
   /**
    * Verify if the user is authenticated with Pinterest
    * @returns Whether the user is authenticated
    */
   verifyAuthentication(): Promise<boolean>;
-  
+
   /**
    * Fetch pins from the Pinterest API
    * @returns Array of pins
    */
   fetchPins(): Promise<PinterestPin[]>;
-  
+
   /**
    * Get a cookie value by name
    * @private

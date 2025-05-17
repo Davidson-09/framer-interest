@@ -4,12 +4,17 @@ This directory contains examples of how to integrate with the Pinterest API serv
 
 ## Examples
 
-1. **React Example** (`react-example.jsx`): Shows how to integrate the Pinterest SDK in a React application.
-2. **Vanilla JavaScript Example** (`vanilla-js-example.html`): Shows how to integrate the Pinterest SDK in a vanilla JavaScript application.
+1. **React Examples**:
+   - `react-example.jsx`: Shows how to integrate the Pinterest SDK in a React application.
+   - `react-callback.jsx`: Shows how to handle the Pinterest authentication callback in a React application.
+
+2. **Vanilla JavaScript Examples**:
+   - `vanilla-js-example.html`: Shows how to integrate the Pinterest SDK in a vanilla JavaScript application.
+   - `vanilla-js-callback.html`: Shows how to handle the Pinterest authentication callback in a vanilla JavaScript application.
 
 ## Running the Examples
 
-### React Example
+### React Examples
 
 1. Create a new React application:
    ```bash
@@ -22,13 +27,20 @@ This directory contains examples of how to integrate with the Pinterest API serv
    npm install pinterest-integration-sdk
    ```
 
-3. Copy the `react-example.jsx` file to your project's `src` directory.
+3. Copy the `react-example.jsx` and `react-callback.jsx` files to your project's `src` directory.
 
-4. Update your `App.js` to use the PinterestIntegration component:
+4. Set up routing in your application:
+   ```bash
+   npm install react-router-dom
+   ```
+
+5. Update your `App.js` to use the components with routing:
    ```jsx
    import React from 'react';
+   import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
    import './App.css';
    import PinterestIntegration from './react-example';
+   import PinterestCallback from './react-callback';
 
    function App() {
      return (
@@ -37,7 +49,14 @@ This directory contains examples of how to integrate with the Pinterest API serv
            <h1>Pinterest Integration Example</h1>
          </header>
          <main>
-           <PinterestIntegration />
+           <Router>
+             <Routes>
+               <Route path="/" element={<PinterestIntegration />} />
+               <Route path="/callback" element={<PinterestCallback />} />
+               <Route path="/dashboard" element={<div>Dashboard Page</div>} />
+               <Route path="/login" element={<div>Login Page</div>} />
+             </Routes>
+           </Router>
          </main>
        </div>
      );
@@ -46,12 +65,12 @@ This directory contains examples of how to integrate with the Pinterest API serv
    export default App;
    ```
 
-5. Start the development server:
+6. Start the development server:
    ```bash
    npm start
    ```
 
-### Vanilla JavaScript Example
+### Vanilla JavaScript Examples
 
 1. Create a new directory for your project:
    ```bash
@@ -59,12 +78,14 @@ This directory contains examples of how to integrate with the Pinterest API serv
    cd pinterest-vanilla-example
    ```
 
-2. Copy the `vanilla-js-example.html` file to your project directory.
+2. Copy both `vanilla-js-example.html` and `vanilla-js-callback.html` files to your project directory.
 
-3. Open the HTML file in your browser:
+3. Open the main HTML file in your browser:
    ```bash
    open vanilla-js-example.html
    ```
+
+4. When you click the "Login with Pinterest" button, you'll be redirected to Pinterest for authentication. After authentication, you'll be redirected to the callback page, which will check for the Pinterest token cookie and redirect you back to the main page.
 
 ## Notes
 
