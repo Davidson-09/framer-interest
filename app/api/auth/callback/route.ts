@@ -6,6 +6,18 @@ import { serialize } from 'cookie';
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');
+  const state = searchParams.get('state');
+
+  // Parse the state parameter to get the returnTo URL
+  let returnTo = '';
+  if (state) {
+    try {
+      const stateObj = JSON.parse(decodeURIComponent(state));
+      returnTo = stateObj.returnTo || '';
+    } catch (error) {
+      console.error('Error parsing state parameter:', error);
+    }
+  }
 
   if (!code) {
     return NextResponse.json(
@@ -52,14 +64,19 @@ export async function GET(request: NextRequest) {
 
     // Set token in secure HttpOnly cookie
     const cookie = serialize('pinterest_token', access_token, {
-      httpOnly: false, // Allow JavaScript access (optional, but required if you want to read it via JS)
+      httpOnly: false, // Allow JavaScript access (required for external sites)
       secure: true, // Must be true when using SameSite=None
       sameSite: 'none', // Enable cross-site cookie sending
       path: '/',
       maxAge: 60 * 60 * 24, // 1 day
     });
 
-    const res = NextResponse.redirect(`https://infam.framer.website/moodboard-1`); // Change path if needed
+    // Determine where to redirect the user
+    // If returnTo is provided and is a valid URL, redirect there
+    // Otherwise, use the default redirect URL
+    const redirectUrl = returnTo || `https://infam.framer.website/moodboard-1`;
+
+    const res = NextResponse.redirect(redirectUrl);
     res.headers.set('Set-Cookie', cookie);
     return res;
 

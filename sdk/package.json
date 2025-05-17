@@ -1,0 +1,26 @@
+{
+  "name": "pinterest-integration-sdk",
+  "version": "1.0.0",
+  "description": "Client-side SDK for Pinterest API integration without script tags",
+  "main": "pinterest-sdk.js",
+  "browser": "pinterest-sdk.min.js",
+  "module": "pinterest-sdk.js",
+  "types": "pinterest-sdk.d.ts",
+  "files": [
+    "pinterest-sdk.js",
+    "pinterest-sdk.min.js",
+    "pinterest-sdk.d.ts",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "pinterest",
+    "api",
+    "integration",
+    "sdk"
+  ],
+  "author": "",
+  "license": "MIT"
+}
