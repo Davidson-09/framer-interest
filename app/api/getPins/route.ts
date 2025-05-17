@@ -7,13 +7,18 @@ interface Board {
   name: string;
 }
 
-// CORS headers for all responses
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*', // Or specify your domain
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie',
-  'Access-Control-Allow-Credentials': 'true',
-};
+// Function to get CORS headers based on the request origin
+function getCorsHeaders(request: NextRequest) {
+  // Get the origin from the request headers
+  const origin = request.headers.get('origin') || '';
+
+  return {
+    'Access-Control-Allow-Origin': origin, // Use the specific origin
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie',
+    'Access-Control-Allow-Credentials': 'true',
+  };
+}
 
 async function getAllBoards(accessToken: string) {
   const response = await axios.get('https://api.pinterest.com/v5/boards', {
@@ -40,10 +45,10 @@ async function getPinsForBoard(accessToken: string, boardId: string) {
 }
 
 // Handle OPTIONS requests for CORS preflight
-export async function OPTIONS() {
+export async function OPTIONS(request: NextRequest) {
   return new NextResponse(null, {
     status: 200,
-    headers: corsHeaders,
+    headers: getCorsHeaders(request),
   });
 }
 
@@ -60,7 +65,7 @@ export async function GET(request: NextRequest) {
       { error: 'Pinterest access token not found in cookies' },
       {
         status: 401,
-        headers: corsHeaders
+        headers: getCorsHeaders(request)
       }
     );
   }
@@ -82,7 +87,7 @@ export async function GET(request: NextRequest) {
         pins: allPins,
       },
       {
-        headers: corsHeaders
+        headers: getCorsHeaders(request)
       }
     );
   } catch (error: any) {
@@ -91,7 +96,7 @@ export async function GET(request: NextRequest) {
       { error: 'Failed to fetch pins' },
       {
         status: 500,
-        headers: corsHeaders
+        headers: getCorsHeaders(request)
       }
     );
   }
