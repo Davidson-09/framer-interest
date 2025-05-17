@@ -52,9 +52,9 @@ export async function GET(request: NextRequest) {
 
     // Set token in secure HttpOnly cookie
     const cookie = serialize('pinterest_token', access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      httpOnly: false, // Allow JavaScript access (optional, but required if you want to read it via JS)
+      secure: true, // Must be true when using SameSite=None
+      sameSite: 'none', // Enable cross-site cookie sending
       path: '/',
       maxAge: 60 * 60 * 24, // 1 day
     });

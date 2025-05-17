@@ -7,6 +7,14 @@ interface Board {
   name: string;
 }
 
+// CORS headers for all responses
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*', // Or specify your domain
+  'Access-Control-Allow-Methods': 'GET, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cookie',
+  'Access-Control-Allow-Credentials': 'true',
+};
+
 async function getAllBoards(accessToken: string) {
   const response = await axios.get('https://api.pinterest.com/v5/boards', {
     headers: {
@@ -31,18 +39,29 @@ async function getPinsForBoard(accessToken: string, boardId: string) {
   return response.data.items;
 }
 
+// Handle OPTIONS requests for CORS preflight
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
 export async function GET(request: NextRequest) {
   // Parse cookies
   const cookieHeader = request.headers.get('cookie') || '';
   const cookies = parse(cookieHeader);
   const accessToken = cookies.pinterest_token;
 
-  console.log('the acess token', accessToken)
+  console.log('the access token', accessToken)
 
   if (!accessToken) {
     return NextResponse.json(
       { error: 'Pinterest access token not found in cookies' },
-      { status: 401 }
+      {
+        status: 401,
+        headers: corsHeaders
+      }
     );
   }
 
@@ -56,18 +75,24 @@ export async function GET(request: NextRequest) {
 
     const allPins = pinsResults.flat();
 
-    return NextResponse.json({
-      total_pins: allPins.length,
-      pins: allPins,
-    });
-    // return NextResponse.json({
-    //   boards: boards,
-    // });
+    // Return response with CORS headers
+    return NextResponse.json(
+      {
+        total_pins: allPins.length,
+        pins: allPins,
+      },
+      {
+        headers: corsHeaders
+      }
+    );
   } catch (error: any) {
     console.error('Error fetching pins:', error.response?.data || error.message);
     return NextResponse.json(
       { error: 'Failed to fetch pins' },
-      { status: 500 }
+      {
+        status: 500,
+        headers: corsHeaders
+      }
     );
   }
 }
