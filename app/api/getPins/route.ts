@@ -53,16 +53,22 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  // Parse cookies
-  const cookieHeader = request.headers.get('cookie') || '';
-  const cookies = parse(cookieHeader);
-  const accessToken = cookies.pinterest_token;
+  // Get access token from query string or cookies
+  const searchParams = request.nextUrl.searchParams;
+  let accessToken: string | null = searchParams.get('access_token');
+
+  // If no token in query string, try to get it from cookies as fallback
+  if (!accessToken) {
+    const cookieHeader = request.headers.get('cookie') || '';
+    const cookies = parse(cookieHeader);
+    accessToken = cookies.pinterest_token || null;
+  }
 
   console.log('the access token', accessToken)
 
   if (!accessToken) {
     return NextResponse.json(
-      { error: 'Pinterest access token not found in cookies' },
+      { error: 'Pinterest access token not found in query string or cookies' },
       {
         status: 401,
         headers: getCorsHeaders(request)

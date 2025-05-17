@@ -24,16 +24,22 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  // Parse cookies
-  const cookieHeader = request.headers.get('cookie') || '';
-  const cookies = parse(cookieHeader);
-  const accessToken = cookies.pinterest_token;
+  // Get access token from query string or cookies
+  const searchParams = request.nextUrl.searchParams;
+  let accessToken: string | null = searchParams.get('access_token');
+
+  // If no token in query string, try to get it from cookies as fallback
+  if (!accessToken) {
+    const cookieHeader = request.headers.get('cookie') || '';
+    const cookies = parse(cookieHeader);
+    accessToken = cookies.pinterest_token || null;
+  }
 
   if (!accessToken) {
     return NextResponse.json(
-      { 
+      {
         isAuthenticated: false,
-        error: 'Pinterest access token not found in cookies' 
+        error: 'Pinterest access token not found in query string or cookies'
       },
       {
         status: 401,
@@ -52,9 +58,9 @@ export async function GET(request: NextRequest) {
 
     // If the request succeeds, the token is valid
     return NextResponse.json(
-      { 
+      {
         isAuthenticated: true,
-        message: 'Token is valid' 
+        message: 'Token is valid'
       },
       {
         headers: getCorsHeaders(request)
@@ -62,12 +68,12 @@ export async function GET(request: NextRequest) {
     );
   } catch (error: any) {
     console.error('Error verifying token:', error.response?.data || error.message);
-    
+
     // If the request fails, the token is invalid or expired
     return NextResponse.json(
-      { 
+      {
         isAuthenticated: false,
-        error: 'Invalid or expired token' 
+        error: 'Invalid or expired token'
       },
       {
         status: 401,

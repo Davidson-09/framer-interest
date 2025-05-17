@@ -15,6 +15,13 @@ We offer two ways to integrate with our Pinterest service:
 1. **SDK Integration (Recommended)**: Use our JavaScript SDK to easily integrate Pinterest functionality
 2. **Direct API Integration**: Make direct API calls to our endpoints
 
+## Authentication Options
+
+We support two methods for authentication:
+
+1. **Cookie-based Authentication (Default)**: The Pinterest access token is stored in a cookie
+2. **Query Parameter Authentication**: The Pinterest access token is passed as a query parameter
+
 ## Prerequisites
 
 - Your external site must be able to make cross-origin requests
@@ -199,10 +206,12 @@ window.onload = handlePinterestCallback;
 
 ### 2. Verifying Authentication
 
-Before making API requests, you can verify if the user is authenticated:
+Before making API requests, you can verify if the user is authenticated. You can use either cookie-based authentication or pass the access token as a query parameter:
+
+#### Using Cookies (Default)
 
 ```javascript
-async function verifyAuthentication() {
+async function verifyAuthenticationWithCookie() {
   try {
     const response = await fetch('https://framer-interest.vercel.app/api/auth/verify', {
       method: 'GET',
@@ -218,17 +227,61 @@ async function verifyAuthentication() {
 }
 ```
 
-### 3. Fetching Pins
-
-Once authenticated, you can fetch pins from our API:
+#### Using Query Parameter
 
 ```javascript
-async function fetchPins() {
+async function verifyAuthenticationWithToken(accessToken) {
+  try {
+    const response = await fetch(`https://framer-interest.vercel.app/api/auth/verify?access_token=${encodeURIComponent(accessToken)}`, {
+      method: 'GET',
+      // No need for credentials: 'include' when using query parameter
+    });
+
+    const data = await response.json();
+    return data.isAuthenticated;
+  } catch (error) {
+    console.error('Error verifying authentication:', error);
+    return false;
+  }
+}
+```
+
+### 3. Fetching Pins
+
+Once authenticated, you can fetch pins from our API. You can use either cookie-based authentication or pass the access token as a query parameter:
+
+#### Using Cookies (Default)
+
+```javascript
+async function fetchPinsWithCookie() {
   try {
     // The credentials: 'include' is crucial to send cookies in cross-origin requests
     const response = await fetch('https://framer-interest.vercel.app/api/getPins', {
       method: 'GET',
       credentials: 'include', // Important for sending cookies
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch pins');
+    }
+
+    const data = await response.json();
+    return data.pins;
+  } catch (error) {
+    console.error('Error fetching pins:', error);
+    return [];
+  }
+}
+```
+
+#### Using Query Parameter
+
+```javascript
+async function fetchPinsWithToken(accessToken) {
+  try {
+    const response = await fetch(`https://framer-interest.vercel.app/api/getPins?access_token=${encodeURIComponent(accessToken)}`, {
+      method: 'GET',
+      // No need for credentials: 'include' when using query parameter
     });
 
     if (!response.ok) {

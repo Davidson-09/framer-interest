@@ -11,6 +11,7 @@ This directory contains examples of how to integrate with the Pinterest API serv
 2. **Vanilla JavaScript Examples**:
    - `vanilla-js-example.html`: Shows how to integrate the Pinterest SDK in a vanilla JavaScript application.
    - `vanilla-js-callback.html`: Shows how to handle the Pinterest authentication callback in a vanilla JavaScript application.
+   - `token-example.html`: Shows how to use the Pinterest SDK with an access token instead of cookies.
 
 ## Running the Examples
 
@@ -86,6 +87,13 @@ This directory contains examples of how to integrate with the Pinterest API serv
    ```
 
 4. When you click the "Login with Pinterest" button, you'll be redirected to Pinterest for authentication. After authentication, you'll be redirected to the callback page, which will check for the Pinterest token cookie and redirect you back to the main page.
+
+5. To try the token-based example, open the token example in your browser:
+   ```bash
+   open token-example.html
+   ```
+
+6. Enter your Pinterest access token in the input field and click "Verify Token" to verify the token, or "Fetch Pins" to fetch and display your pins.
 
 ## Notes
 

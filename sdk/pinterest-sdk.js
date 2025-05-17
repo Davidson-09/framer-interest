@@ -85,13 +85,21 @@ class PinterestSDK {
 
   /**
    * Verify if the user is authenticated with Pinterest
+   * @param {string} accessToken - Optional access token to use instead of cookie
    * @returns {Promise<boolean>} - Whether the user is authenticated
    */
-  async verifyAuthentication() {
+  async verifyAuthentication(accessToken = null) {
     try {
-      const response = await fetch(`${this.config.apiBaseUrl}/api/auth/verify`, {
+      let url = `${this.config.apiBaseUrl}/api/auth/verify`;
+
+      // If access token is provided, add it to the query string
+      if (accessToken) {
+        url += `?access_token=${encodeURIComponent(accessToken)}`;
+      }
+
+      const response = await fetch(url, {
         method: 'GET',
-        credentials: 'include', // Important for sending cookies
+        credentials: 'include', // Important for sending cookies (used as fallback)
       });
 
       const data = await response.json();
@@ -104,21 +112,35 @@ class PinterestSDK {
 
   /**
    * Fetch pins from the Pinterest API
+   * @param {string} accessToken - Optional access token to use instead of cookie
    * @returns {Promise<Array>} - Array of pins
    */
-  async fetchPins() {
+  async fetchPins(accessToken = null) {
     try {
       if (!this.isInitialized) {
         await this.init();
       }
 
-      if (!this.isAuthenticated) {
+      // If access token is provided, verify authentication with it
+      // Otherwise, check if the user is authenticated via cookie
+      if (accessToken) {
+        const isAuthenticated = await this.verifyAuthentication(accessToken);
+        if (!isAuthenticated) {
+          throw new Error('Invalid or expired access token');
+        }
+      } else if (!this.isAuthenticated) {
         throw new Error('User is not authenticated with Pinterest');
       }
 
-      const response = await fetch(`${this.config.apiBaseUrl}/api/getPins`, {
+      // Build the URL with or without the access token
+      let url = `${this.config.apiBaseUrl}/api/getPins`;
+      if (accessToken) {
+        url += `?access_token=${encodeURIComponent(accessToken)}`;
+      }
+
+      const response = await fetch(url, {
         method: 'GET',
-        credentials: 'include', // Important for sending cookies
+        credentials: 'include', // Important for sending cookies (used as fallback)
       });
 
       if (!response.ok) {

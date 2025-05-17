@@ -83,15 +83,17 @@ declare class PinterestSDK {
 
   /**
    * Verify if the user is authenticated with Pinterest
+   * @param accessToken - Optional access token to use instead of cookie
    * @returns Whether the user is authenticated
    */
-  verifyAuthentication(): Promise<boolean>;
+  verifyAuthentication(accessToken?: string | null): Promise<boolean>;
 
   /**
    * Fetch pins from the Pinterest API
+   * @param accessToken - Optional access token to use instead of cookie
    * @returns Array of pins
    */
-  fetchPins(): Promise<PinterestPin[]>;
+  fetchPins(accessToken?: string | null): Promise<PinterestPin[]>;
 
   /**
    * Get a cookie value by name

@@ -127,21 +127,32 @@ Check if the user is authenticated with Pinterest.
 const isAuthenticated = pinterest.isUserAuthenticated();
 ```
 
-#### `verifyAuthentication()`
+#### `verifyAuthentication(accessToken)`
 
-Verify if the user is authenticated with Pinterest.
+Verify if the user is authenticated with Pinterest. You can optionally provide an access token to use instead of the cookie.
 
 ```javascript
+// Verify using the cookie (default)
 const isAuthenticated = await pinterest.verifyAuthentication();
+
+// Verify using an access token
+const accessToken = 'your-pinterest-access-token';
+const isAuthenticated = await pinterest.verifyAuthentication(accessToken);
 ```
 
-#### `fetchPins()`
+#### `fetchPins(accessToken)`
 
-Fetch pins from the Pinterest API.
+Fetch pins from the Pinterest API. You can optionally provide an access token to use instead of the cookie.
 
 ```javascript
 try {
+  // Fetch pins using the cookie (default)
   const pins = await pinterest.fetchPins();
+  console.log('Pins:', pins);
+
+  // Or fetch pins using an access token
+  const accessToken = 'your-pinterest-access-token';
+  const pins = await pinterest.fetchPins(accessToken);
   console.log('Pins:', pins);
 } catch (error) {
   console.error('Error fetching pins:', error);
@@ -230,6 +241,44 @@ document.addEventListener('DOMContentLoaded', () => {
   // You can also specify custom redirect URLs:
   // pinterest.handleCallback('/home', '/login');
 });
+```
+
+### Using Access Token Instead of Cookies
+
+If you prefer not to use cookies or are working in an environment where cookies are not available, you can use the access token directly:
+
+```javascript
+import PinterestSDK from 'pinterest-integration-sdk';
+
+// Initialize the SDK
+const pinterest = new PinterestSDK({
+  apiBaseUrl: 'https://framer-interest.vercel.app',
+});
+
+// Example function to use access token instead of cookies
+async function fetchPinsWithToken(accessToken) {
+  try {
+    // Verify the token is valid
+    const isAuthenticated = await pinterest.verifyAuthentication(accessToken);
+
+    if (isAuthenticated) {
+      // Fetch pins using the access token
+      const pins = await pinterest.fetchPins(accessToken);
+      console.log('Pins:', pins);
+
+      // Do something with the pins
+      renderPins(pins);
+    } else {
+      console.error('Invalid or expired access token');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// Usage
+const accessToken = 'your-pinterest-access-token';
+fetchPinsWithToken(accessToken);
 ```
 
 ## License
