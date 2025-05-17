@@ -153,7 +153,7 @@ When a user wants to log in with Pinterest, redirect them to our login endpoint:
 ```javascript
 function loginWithPinterest() {
   // The returnTo parameter should be your callback URL on your site
-  const returnUrl = encodeURIComponent('https://your-site.com/pinterest-callback');
+  const returnUrl = encodeURIComponent('https://infam.framer.website/moodboard-1');
   window.location.href = 'https://framer-interest.vercel.app/api/auth/login?returnTo=' + returnUrl;
 }
 ```
