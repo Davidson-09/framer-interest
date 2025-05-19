@@ -129,15 +129,15 @@ const isAuthenticated = pinterest.isUserAuthenticated();
 
 #### `verifyAuthentication(accessToken)`
 
-Verify if the user is authenticated with Pinterest. You can optionally provide an access token to use instead of the cookie.
+Check if a token exists (without verifying with Pinterest). You can optionally provide an access token to use instead of the cookie.
 
 ```javascript
-// Verify using the cookie (default)
-const isAuthenticated = await pinterest.verifyAuthentication();
+// Check using the cookie (default)
+const hasToken = await pinterest.verifyAuthentication();
 
-// Verify using an access token
+// Check using an access token
 const accessToken = 'your-pinterest-access-token';
-const isAuthenticated = await pinterest.verifyAuthentication(accessToken);
+const hasToken = await pinterest.verifyAuthentication(accessToken);
 ```
 
 #### `fetchPins(accessToken)`

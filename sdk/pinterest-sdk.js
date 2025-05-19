@@ -84,28 +84,34 @@ class PinterestSDK {
   }
 
   /**
-   * Verify if the user is authenticated with Pinterest
+   * Check if a token exists (without verifying with Pinterest)
    * @param {string} accessToken - Optional access token to use instead of cookie
-   * @returns {Promise<boolean>} - Whether the user is authenticated
+   * @returns {Promise<boolean>} - Whether a token exists
    */
   async verifyAuthentication(accessToken = null) {
     try {
-      let url = `${this.config.apiBaseUrl}/api/auth/verify`;
-
-      // If access token is provided, add it to the query string
-      if (accessToken) {
-        url += `?access_token=${encodeURIComponent(accessToken)}`;
+      // Get token from cookie if not provided
+      if (!accessToken) {
+        accessToken = this._getCookie(this.config.pinterestTokenCookieName);
       }
 
-      const response = await fetch(url, {
-        method: 'GET',
-        credentials: 'include', // Important for sending cookies (used as fallback)
-      });
+      if (!accessToken) {
+        console.log('No token found');
+        return false;
+      }
 
-      const data = await response.json();
-      return data.isAuthenticated;
+      // Simply check if the token exists and has a reasonable length
+      const isReasonableLength = accessToken.length > 20; // Most OAuth tokens are longer than this
+
+      if (!isReasonableLength) {
+        console.log('Token appears to be too short to be valid');
+        return false;
+      }
+
+      console.log('Token exists and has reasonable length');
+      return true;
     } catch (error) {
-      console.error('Error verifying authentication:', error);
+      console.error('Error checking token:', error);
       return false;
     }
   }

@@ -20,7 +20,6 @@ async function getPins() {
 
 export default async function PinsPage() {
   const pins = await getPins();
-  console.log('the pincs', JSON.stringify(pins, null, 3))
 
   return (
     <main className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">

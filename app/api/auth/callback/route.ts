@@ -61,13 +61,13 @@ export async function GET(request: NextRequest) {
     );
 
     const { access_token } = response.data;
-    console.log('the access token', access_token)
+    console.log('Received access token (first 10 chars):', access_token.substring(0, 10) + '...');
 
     // Set token in secure HttpOnly cookie
     const cookie = serialize('pinterest_token', access_token, {
       httpOnly: false, // Allow JavaScript access (required for external sites)
-      secure: true, // Must be true when using SameSite=None
-      sameSite: 'none', // Enable cross-site cookie sending
+      secure: process.env.NODE_ENV === 'production', // Only use secure in production
+      sameSite: 'lax', // Use lax for better compatibility
       path: '/',
       maxAge: 60 * 60 * 24, // 1 day
     });
@@ -75,7 +75,11 @@ export async function GET(request: NextRequest) {
     // Determine where to redirect the user
     // If returnTo is provided and is a valid URL, redirect there
     // Otherwise, use the default redirect URL
-    const redirectUrl = returnTo? `${returnTo}?token=${access_token}` : `https://infam.framer.website/moodboard-1?token=${access_token}`;
+    const redirectUrl = returnTo ?
+      `${returnTo}${returnTo.includes('?') ? '&' : '?'}token=${encodeURIComponent(access_token)}` :
+      `/moodboards?token=${encodeURIComponent(access_token)}`;
+
+    console.log('Redirecting to:', redirectUrl);
 
     const res = NextResponse.redirect(redirectUrl);
     res.headers.set('Set-Cookie', cookie);

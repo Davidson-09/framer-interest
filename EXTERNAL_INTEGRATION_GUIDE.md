@@ -204,24 +204,42 @@ function handlePinterestCallback() {
 window.onload = handlePinterestCallback;
 ```
 
-### 2. Verifying Authentication
+### 2. Checking Authentication
 
-Before making API requests, you can verify if the user is authenticated. You can use either cookie-based authentication or pass the access token as a query parameter:
+Before making API requests, you can check if a token exists. You can use either cookie-based authentication or pass the access token as a query parameter:
 
 #### Using Cookies (Default)
 
 ```javascript
-async function verifyAuthenticationWithCookie() {
+async function checkAuthenticationWithCookie() {
   try {
-    const response = await fetch('https://framer-interest.vercel.app/api/auth/verify', {
-      method: 'GET',
-      credentials: 'include', // Important for sending cookies
-    });
+    // Get token from cookie
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    }
 
-    const data = await response.json();
-    return data.isAuthenticated;
+    const accessToken = getCookie('pinterest_token');
+
+    if (!accessToken) {
+      console.log('No token found');
+      return false;
+    }
+
+    // Simply check if the token exists and has a reasonable length
+    const isReasonableLength = accessToken.length > 20; // Most OAuth tokens are longer than this
+
+    if (!isReasonableLength) {
+      console.log('Token appears to be too short to be valid');
+      return false;
+    }
+
+    console.log('Token exists and has reasonable length');
+    return true;
   } catch (error) {
-    console.error('Error verifying authentication:', error);
+    console.error('Error checking authentication:', error);
     return false;
   }
 }
@@ -230,17 +248,25 @@ async function verifyAuthenticationWithCookie() {
 #### Using Query Parameter
 
 ```javascript
-async function verifyAuthenticationWithToken(accessToken) {
+async function checkAuthenticationWithToken(accessToken) {
   try {
-    const response = await fetch(`https://framer-interest.vercel.app/api/auth/verify?access_token=${encodeURIComponent(accessToken)}`, {
-      method: 'GET',
-      // No need for credentials: 'include' when using query parameter
-    });
+    if (!accessToken) {
+      console.log('No token provided');
+      return false;
+    }
 
-    const data = await response.json();
-    return data.isAuthenticated;
+    // Simply check if the token exists and has a reasonable length
+    const isReasonableLength = accessToken.length > 20; // Most OAuth tokens are longer than this
+
+    if (!isReasonableLength) {
+      console.log('Token appears to be too short to be valid');
+      return false;
+    }
+
+    console.log('Token exists and has reasonable length');
+    return true;
   } catch (error) {
-    console.error('Error verifying authentication:', error);
+    console.error('Error checking authentication:', error);
     return false;
   }
 }

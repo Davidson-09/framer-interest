@@ -1,9 +1,9 @@
 /**
  * Pinterest Integration Script
- * 
+ *
  * This script provides easy integration with the Pinterest API for external websites.
  * It handles authentication, fetching pins, and rendering them on your site.
- * 
+ *
  * @version 1.0.0
  */
 
@@ -20,8 +20,8 @@
     pinTemplate: pin => `
       <div class="pinterest-pin">
         <div class="pinterest-pin-image">
-          ${pin.media?.images?.["600x"]?.url ? 
-            `<img src="${pin.media.images["600x"].url}" alt="${pin.title || 'Pinterest Pin'}">` : 
+          ${pin.media?.images?.["600x"]?.url ?
+            `<img src="${pin.media.images["600x"].url}" alt="${pin.title || 'Pinterest Pin'}">` :
             '<div class="pinterest-pin-no-image">No image</div>'}
         </div>
         <div class="pinterest-pin-content">
@@ -85,20 +85,31 @@
     }
 
     /**
-     * Verify if the user is authenticated with Pinterest
-     * @returns {Promise<boolean>} - Whether the user is authenticated
+     * Check if a token exists (without verifying with Pinterest)
+     * @returns {Promise<boolean>} - Whether a token exists
      */
     async verifyAuthentication() {
       try {
-        const response = await fetch(`${this.config.apiBaseUrl}/api/auth/verify`, {
-          method: 'GET',
-          credentials: 'include', // Important for sending cookies
-        });
+        // Get token from cookie
+        const accessToken = this._getCookie(this.config.pinterestTokenCookieName);
 
-        const data = await response.json();
-        return data.isAuthenticated;
+        if (!accessToken) {
+          console.log('No token found');
+          return false;
+        }
+
+        // Simply check if the token exists and has a reasonable length
+        const isReasonableLength = accessToken.length > 20; // Most OAuth tokens are longer than this
+
+        if (!isReasonableLength) {
+          console.log('Token appears to be too short to be valid');
+          return false;
+        }
+
+        console.log('Token exists and has reasonable length');
+        return true;
       } catch (error) {
-        console.error('Error verifying authentication:', error);
+        console.error('Error checking token:', error);
         return false;
       }
     }
@@ -109,7 +120,7 @@
      */
     async fetchPins() {
       this._showLoading(true);
-      
+
       try {
         if (!this.isInitialized) {
           await this.init();
@@ -146,7 +157,7 @@
      */
     renderPins(pins, containerSelector = null) {
       const container = document.querySelector(containerSelector || this.config.containerSelector);
-      
+
       if (!container) {
         console.error(`Container not found: ${containerSelector || this.config.containerSelector}`);
         return;
