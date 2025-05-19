@@ -103,8 +103,8 @@ export default function MoodboardDetail({ moodboardId, accessToken }: MoodboardD
   return (
     <div className="w-full max-w-6xl mx-auto">
       <div className="mb-6">
-        <Link href="/moodboards" className="text-blue-600 hover:underline mb-4 inline-block">
-          ← Back to Moodboards
+        <Link href={`https://infam.framer.website/${moodboard?.name}`} className="text-blue-600 hover:underline mb-4 inline-block">
+          ← Done
         </Link>
         <h1 className="text-3xl font-bold mb-2">{moodboard.name}</h1>
         {moodboard.description && (
