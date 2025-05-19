@@ -7,7 +7,7 @@ import PinterestLogin from '@/app/components/PinterestLogin';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { verifyToken, getTokenFromUrl, cleanupUrl } from '@/lib/auth/authService';
 
-export default function MoodboardPage({ params }: { params: { id: string } }) {
+export default function MoodboardPage({ params }: { params: any }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { token, userEmail, isAuthenticated, setToken } = useAuth();

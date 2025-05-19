@@ -4,7 +4,7 @@ import { getMoodboardById, updateMoodboard, deleteMoodboard } from '@/lib/supaba
 // Get a specific moodboard
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: any }
 ) {
   try {
     // Check for access token
@@ -32,7 +32,7 @@ export async function GET(
 // Update a moodboard
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: any }
 ) {
   try {
     // Check for access token
@@ -74,7 +74,7 @@ export async function PUT(
 // Delete a moodboard
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: any }
 ) {
   try {
     // Check for access token

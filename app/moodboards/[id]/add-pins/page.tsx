@@ -23,7 +23,7 @@ interface Pin {
   link?: string;
 }
 
-export default function AddPinsPage({ params }: { params: { id: string } }) {
+export default function AddPinsPage({ params }: { params: any }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { token, userEmail, isAuthenticated } = useAuth();
@@ -174,7 +174,7 @@ export default function AddPinsPage({ params }: { params: { id: string } }) {
             <p className="text-gray-600">Please wait, this may take a moment.</p>
           </div>
         ) : (
-          <PinSelector onPinSelect={handlePinSelect} accessToken={token} />
+          <PinSelector onPinSelect={handlePinSelect} accessToken={token as string} />
         )}
       </div>
     </div>

@@ -16,7 +16,7 @@ interface Moodboard {
   updated_at: string;
 }
 
-export default function UserMoodboardPage({ params }: { params: { name: string } }) {
+export default function UserMoodboardPage({ params }: { params: any }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('email');

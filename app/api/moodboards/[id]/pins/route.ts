@@ -4,7 +4,7 @@ import { getMoodboardPins, addPinToMoodboard, removePinFromMoodboard } from '@/l
 // Get all pins for a moodboard
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: any }
 ) {
   try {
     // Check for access token
@@ -32,7 +32,7 @@ export async function GET(
 // Add a pin to a moodboard
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: any }
 ) {
   try {
     // Check for access token
@@ -77,7 +77,7 @@ export async function POST(
 // Delete a pin from a moodboard
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: any }
 ) {
   try {
     // Check for access token

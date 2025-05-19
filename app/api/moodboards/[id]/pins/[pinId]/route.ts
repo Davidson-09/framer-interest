@@ -4,7 +4,7 @@ import { updatePinPosition, removePinFromMoodboard } from '@/lib/supabase';
 // Update pin position
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string; pinId: string } }
+  { params }: { params: any }
 ) {
   try {
     const pinId = params.pinId;
@@ -33,7 +33,7 @@ export async function PATCH(
 // Delete a specific pin from a moodboard
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; pinId: string } }
+  { params }: { params: any }
 ) {
   try {
     const pinId = params.pinId;
