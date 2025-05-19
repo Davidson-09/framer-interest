@@ -33,7 +33,7 @@ export async function getMoodboardsByEmail(email: string) {
     .select('*')
     .eq('user_email', email)
     .order('created_at', { ascending: false });
-  
+
   if (error) throw error;
   return data as Moodboard[];
 }
@@ -44,8 +44,26 @@ export async function getMoodboardById(id: string) {
     .select('*')
     .eq('id', id)
     .single();
-  
+
   if (error) throw error;
+  return data as Moodboard;
+}
+
+export async function getMoodboardByNameAndEmail(name: string, email: string) {
+  const { data, error } = await supabase
+    .from('moodboards')
+    .select('*')
+    .eq('name', name)
+    .eq('user_email', email)
+    .single();
+
+  if (error) {
+    // If no moodboard found, return null instead of throwing an error
+    if (error.code === 'PGRST116') {
+      return null;
+    }
+    throw error;
+  }
   return data as Moodboard;
 }
 
@@ -55,7 +73,7 @@ export async function createMoodboard(moodboard: Partial<Moodboard>) {
     .insert(moodboard)
     .select()
     .single();
-  
+
   if (error) throw error;
   return data as Moodboard;
 }
@@ -67,7 +85,7 @@ export async function updateMoodboard(id: string, updates: Partial<Moodboard>) {
     .eq('id', id)
     .select()
     .single();
-  
+
   if (error) throw error;
   return data as Moodboard;
 }
@@ -77,7 +95,7 @@ export async function deleteMoodboard(id: string) {
     .from('moodboards')
     .delete()
     .eq('id', id);
-  
+
   if (error) throw error;
   return true;
 }
@@ -89,7 +107,7 @@ export async function getMoodboardPins(moodboardId: string) {
     .select('*')
     .eq('moodboard_id', moodboardId)
     .order('created_at', { ascending: false });
-  
+
   if (error) throw error;
   return data as MoodboardPin[];
 }
@@ -100,7 +118,7 @@ export async function addPinToMoodboard(pin: Partial<MoodboardPin>) {
     .insert(pin)
     .select()
     .single();
-  
+
   if (error) throw error;
   return data as MoodboardPin;
 }
@@ -110,7 +128,7 @@ export async function removePinFromMoodboard(id: string) {
     .from('moodboard_pins')
     .delete()
     .eq('id', id);
-  
+
   if (error) throw error;
   return true;
 }
@@ -122,7 +140,50 @@ export async function updatePinPosition(id: string, position_x: number, position
     .eq('id', id)
     .select()
     .single();
-  
+
   if (error) throw error;
   return data as MoodboardPin;
+}
+
+// Create default moodboards for a user if they don't exist
+export async function createDefaultMoodboards(email: string) {
+  try {
+    console.log(`Creating default moodboards for ${email}`);
+
+    // Check if user already has moodboards
+    const existingMoodboards = await getMoodboardsByEmail(email);
+    console.log(`User has ${existingMoodboards.length} existing moodboards`);
+
+    // If user already has moodboards, don't create defaults
+    if (existingMoodboards && existingMoodboards.length > 0) {
+      console.log('User already has moodboards, returning existing ones');
+      return existingMoodboards;
+    }
+
+    // Create 5 default moodboards
+    console.log('Creating 5 default moodboards');
+    const defaultMoodboards = [];
+    for (let i = 1; i <= 5; i++) {
+      console.log(`Creating moodboard-${i}`);
+      try {
+        const moodboard = await createMoodboard({
+          name: `moodboard-${i}`,
+          description: `Default moodboard ${i}`,
+          user_email: email,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+        console.log(`Created moodboard-${i} with ID: ${moodboard.id}`);
+        defaultMoodboards.push(moodboard);
+      } catch (err) {
+        console.error(`Error creating moodboard-${i}:`, err);
+      }
+    }
+
+    console.log(`Successfully created ${defaultMoodboards.length} default moodboards`);
+    return defaultMoodboards;
+  } catch (error) {
+    console.error('Error creating default moodboards:', error);
+    throw error;
+  }
 }

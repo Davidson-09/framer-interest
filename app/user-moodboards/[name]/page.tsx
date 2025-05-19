@@ -3,17 +3,29 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import MoodboardDetail from '@/app/components/MoodboardDetail';
-import PinterestLogin from '@/app/components/PinterestLogin';
+import AutoPinterestLogin from '@/app/components/AutoPinterestLogin';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { verifyToken, getTokenFromUrl, cleanupUrl } from '@/lib/auth/authService';
 
-export default function MoodboardPage({ params }: { params: { id: string } }) {
+interface Moodboard {
+  id: string;
+  name: string;
+  description?: string;
+  user_email: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export default function UserMoodboardPage({ params }: { params: { name: string } }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { token, userEmail, isAuthenticated, setToken } = useAuth();
+  const email = searchParams.get('email');
+  const { token, userEmail, isAuthenticated, setToken, setUserEmail } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [pageToken, setPageToken] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [moodboard, setMoodboard] = useState<Moodboard | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Handle token from URL or context
   useEffect(() => {
@@ -97,12 +109,65 @@ export default function MoodboardPage({ params }: { params: { id: string } }) {
     }
   }, [router, isAuthenticated, userEmail, pageToken]);
 
+  // Store the email from the query parameter in the auth context
+  useEffect(() => {
+    if (email && !userEmail) {
+      setUserEmail(email);
+    }
+  }, [email, userEmail, setUserEmail]);
+
+  // Fetch moodboard data
+  useEffect(() => {
+    const fetchMoodboard = async () => {
+      if (showLoginPrompt || isLoading || !email) {
+        return;
+      }
+
+      try {
+        // Fetch moodboard by name and email
+        let url = `/api/moodboards/by-name?name=${encodeURIComponent(params.name)}&email=${encodeURIComponent(email)}`;
+        if (pageToken) {
+          url += `&access_token=${encodeURIComponent(pageToken)}`;
+        }
+
+        const response = await fetch(url, {
+          credentials: 'include', // Include cookies if no access token
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch moodboard: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        setMoodboard(data.moodboard);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching moodboard:', err);
+        setError('Failed to load moodboard');
+      }
+    };
+
+    fetchMoodboard();
+  }, [params.name, email, pageToken, showLoginPrompt, isLoading]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Loading...</h1>
           <p className="text-gray-600">Please wait while we load your moodboard.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!email) {
+    return (
+      <div className="min-h-screen p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center py-8 text-red-500">
+            Email parameter is required. Please use a URL like /user-moodboards/{params.name}?email=your@email.com
+          </div>
         </div>
       </div>
     );
@@ -120,11 +185,11 @@ export default function MoodboardPage({ params }: { params: { id: string } }) {
               You need to connect with Pinterest to view this moodboard.
             </p>
             <div className="flex justify-center">
-              <PinterestLogin
-                onLogin={(email) => {
-                  // The PinterestLogin component will handle the redirect to Pinterest
-                  // We'll store the current URL to return to after authentication
-                  console.log(`Logging in with email: ${email}`);
+              <AutoPinterestLogin
+                email={email || ''}
+                onLogin={(loginEmail: string) => {
+                  // The AutoPinterestLogin component will handle the redirect to Pinterest
+                  console.log(`Logging in with email: ${loginEmail}`);
                 }}
               />
             </div>
@@ -134,10 +199,22 @@ export default function MoodboardPage({ params }: { params: { id: string } }) {
     );
   }
 
+  if (error || !moodboard) {
+    return (
+      <div className="min-h-screen p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center py-8 text-red-500">
+            {error || 'Moodboard not found'}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-6xl mx-auto">
-        <MoodboardDetail moodboardId={params.id} accessToken={pageToken} />
+        <MoodboardDetail moodboardId={moodboard.id} accessToken={pageToken} />
       </div>
     </div>
   );
