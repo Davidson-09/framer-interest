@@ -112,7 +112,7 @@ export default function PinSelector({ onPinSelect, accessToken }: PinSelectorPro
           <button
             onClick={handleAddSelectedPins}
             disabled={selectedPins.length === 0}
-            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            className="bg-[#E60023] text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
           >
             Add Selected Pins
           </button>
@@ -130,7 +130,7 @@ export default function PinSelector({ onPinSelect, accessToken }: PinSelectorPro
               onClick={() => togglePinSelection(pin)}
               className={`
                 relative rounded-lg overflow-hidden cursor-pointer transition-all
-                ${isSelected ? 'ring-4 ring-blue-500 scale-95' : 'hover:shadow-lg'}
+                ${isSelected ? 'ring-4 ring-[#E60023] scale-95' : 'hover:shadow-lg'}
               `}
             >
               {imageUrl ? (
@@ -150,7 +150,7 @@ export default function PinSelector({ onPinSelect, accessToken }: PinSelectorPro
               )}
 
               {isSelected && (
-                <div className="absolute top-2 right-2 bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
+                <div className="absolute top-2 right-2 bg-[#E60023] text-white rounded-full w-6 h-6 flex items-center justify-center">
                   ✓
                 </div>
               )}
