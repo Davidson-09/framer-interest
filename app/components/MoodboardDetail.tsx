@@ -103,7 +103,7 @@ export default function MoodboardDetail({ moodboardId, accessToken }: MoodboardD
   return (
     <div className="w-full max-w-6xl mx-auto">
       <div className="mb-6">
-        <Link href={`https://infam.framer.website/${moodboard?.name}`} className="text-blue-600 hover:underline mb-4 inline-block">
+        <Link href={`https://infam.framer.website/${moodboard?.name}`} className="text-[#E60023] hover:underline mb-4 inline-block">
           ← Done
         </Link>
         <h1 className="text-3xl font-bold mb-2">{moodboard.name}</h1>
@@ -123,7 +123,7 @@ export default function MoodboardDetail({ moodboardId, accessToken }: MoodboardD
           href={accessToken
             ? `/moodboards/${moodboardId}/add-pins?token=${accessToken}`
             : `/moodboards/${moodboardId}/add-pins`}
-          className="bg-[#E60023] text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="hover:bg-[#E60023] border rounded-full border-[#E60023] hover:text-white text-[#E60023] py-2 px-4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           Add Pins
         </Link>
@@ -136,7 +136,7 @@ export default function MoodboardDetail({ moodboardId, accessToken }: MoodboardD
             href={accessToken
               ? `/moodboards/${moodboardId}/add-pins?token=${accessToken}`
               : `/moodboards/${moodboardId}/add-pins`}
-            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="bg-[#E60023] text-white py-2 px-4 rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             Add Pins from Pinterest
           </Link>

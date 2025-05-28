@@ -161,7 +161,7 @@ export default function AddPinsPage({ params }: { params: any }) {
             href={pageToken
               ? `/moodboards/${params.id}?token=${encodeURIComponent(pageToken)}`
               : `/moodboards/${params.id}`}
-            className="text-blue-600 hover:underline mb-4 inline-block"
+            className="text-[#E60023] hover:underline mb-4 inline-block"
           >
             ← Back to Moodboard
           </Link>
